@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Battle Simulator</title>
+    <style>
+        :root {
+            --primary-color: #c62828;
+            --secondary-color: #1565c0;
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .battle-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .battle-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .army-section {
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .attack-section {
+            background-color: rgba(198, 40, 40, 0.1);
+            border: 1px solid var(--primary-color);
+        }
+
+        .defense-section {
+            background-color: rgba(21, 101, 192, 0.1);
+            border: 1px solid var(--secondary-color);
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .attack-section h2 {
+            color: var(--primary-color);
+        }
+
+        .defense-section h2 {
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 20px 0;
+        }
+
+        button:hover {
+            background-color: #b71c1c;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background-color: #f8f8f8;
+            display: none;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-label {
+            font-weight: bold;
+        }
+
+        .dice-results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .dice {
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .attack-dice {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .defense-dice {
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .casualties {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .attack-casualties {
+            background-color: rgba(198, 40, 40, 0.2);
+            color: var(--primary-color);
+        }
+
+        .defense-casualties {
+            background-color: rgba(21, 101, 192, 0.2);
+            color: var(--secondary-color);
+        }
+
+        .victory {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .attack-victory {
+            background-color: rgba(198, 40, 40, 0.2);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .defense-victory {
+            background-color: rgba(21, 101, 192, 0.2);
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+        }
+
+        .remaining-troops {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .history {
+            margin-top: 30px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-history {
+            background-color: #666;
+            margin-top: 10px;
+        }
+
+        .toggle-history:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Risk Battle Simulator</h1>
+        
+        <div class="battle-form">
+            <div class="army-section attack-section">
+                <h2>Attacker</h2>
+                <div class="form-group">
+                    <label for="attack-dice">Number of Attack Dice:</label>
+                    <input type="number" id="attack-dice" min="1" max="100" value="3">
+                </div>
+                <div class="form-group">
+                    <label for="attack-troops">Attacking Troops:</label>
+                    <input type="number" id="attack-troops" min="1" value="10">
+                </div>
+            </div>
+            
+            <div class="army-section defense-section">
+                <h2>Defender</h2>
+                <div class="form-group">
+                    <label for="defense-dice">Number of Defense Dice:</label>
+                    <input type="number" id="defense-dice" min="1" max="100" value="2">
+                </div>
+                <div class="form-group">
+                    <label for="defense-troops">Defending Troops:</label>
+                    <input type="number" id="defense-troops" min="1" value="10">
+                </div>
+            </div>
+        </div>
+        
+        <button id="roll-button">Roll Dice!</button>
+        
+        <div class="results" id="results">
+            <div class="result-row">
+                <div class="result-label">Attack Dice:</div>
+                <div class="dice-results" id="attack-results"></div>
+            </div>
+            <div class="result-row">
+                <div class="result-label">Defense Dice:</div>
+                <div class="dice-results" id="defense-results"></div>
+            </div>
+            
+            <div class="casualties attack-casualties" id="attack-casualties">
+                Attacker loses: 0 troops
+            </div>
+            <div class="casualties defense-casualties" id="defense-casualties">
+                Defender loses: 0 troops
+            </div>
+            
+            <div class="remaining-troops" id="remaining-troops"></div>
+            
+            <div class="victory attack-victory" id="attack-victory">
+                Attacker conquers the territory!
+            </div>
+            <div class="victory defense-victory" id="defense-victory">
+                Defender holds the territory!
+            </div>
+        </div>
+        
+        <button class="toggle-history" id="toggle-history">Show Battle History</button>
+        
+        <div class="history" id="history"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rollButton = document.getElementById('roll-button');
+            const toggleHistoryButton = document.getElementById('toggle-history');
+            const resultsDiv = document.getElementById('results');
+            const historyDiv = document.getElementById('history');
+            let historyVisible = false;
+            
+            // Initialize with a sample history item
+            addHistoryItem("Ready for battle! Roll the dice to begin.");
+            
+            rollButton.addEventListener('click', rollDice);
+            toggleHistoryButton.addEventListener('click', toggleHistory);
+            
+            function rollDice() {
+                // Get input values
+                const attackDice = Math.min(parseInt(document.getElementById('attack-dice').value), 100);
+                const defenseDice = Math.min(parseInt(document.getElementById('defense-dice').value), 100);
+                let attackTroops = parseInt(document.getElementById('attack-troops').value);
+                let defenseTroops = parseInt(document.getElementById('defense-troops').value);
+                
+                // Validate inputs
+                if (attackDice < 1 || defenseDice < 1 || attackTroops < 1 || defenseTroops < 1) {
+                    alert("Please enter valid numbers (at least 1) for all fields.");
+                    return;
+                }
+                
+                if (attackDice >= attackTroops) {
+                    alert("Attacker must have more troops than dice used.");
+                    return;
+                }
+                
+                // Generate dice rolls
+                const attackRolls = [];
+                const defenseRolls = [];
+                
+                for (let i = 0; i < attackDice; i++) {
+                    attackRolls.push(Math.floor(Math.random() * 6) + 1);
+                }
+                
+                for (let i = 0; i < defenseDice; i++) {
+                    defenseRolls.push(Math.floor(Math.random() * 6) + 1);
+                }
+                
+                // Sort rolls in descending order
+                attackRolls.sort((a, b) => b - a);
+                defenseRolls.sort((a, b) => b - a);
+                
+                // Compare dice
+                const comparisons = Math.min(attackRolls.length, defenseRolls.length);
+                let attackLosses = 0;
+                let defenseLosses = 0;
+                
+                for (let i = 0; i < comparisons; i++) {
+                    if (attackRolls[i] > defenseRolls[i]) {
+                        defenseLosses++;
+                    } else {
+                        attackLosses++;
+                    }
+                }
+                
+                // Update troops
+                const newAttackTroops = attackTroops - attackLosses;
+                const newDefenseTroops = defenseTroops - defenseLosses;
+                
+                // Display results
+                displayResults(attackRolls, defenseRolls, attackLosses, defenseLosses, newAttackTroops, newDefenseTroops);
+                
+                // Add to history
+                const historyText = `Attack: ${attackDice}d (${attackRolls.join(', ')}) vs Defense: ${defenseDice}d (${defenseRolls.join(', ')}) - Attacker loses ${attackLosses}, Defender loses ${defenseLosses}`;
+                addHistoryItem(historyText);
+                
+                // Check for victory
+                checkVictory(newAttackTroops, newDefenseTroops);
+            }
+            
+            function displayResults(attackRolls, defenseRolls, attackLosses, defenseLosses, newAttackTroops, newDefenseTroops) {
+                // Show attack dice
+                const attackResultsDiv = document.getElementById('attack-results');
+                attackResultsDiv.innerHTML = '';
+                attackRolls.forEach(roll => {
+                    const diceDiv = document.createElement('div');
+                    diceDiv.className = 'dice attack-dice';
+                    diceDiv.textContent = roll;
+                    attackResultsDiv.appendChild(diceDiv);
+                });
+                
+                // Show defense dice
+                const defenseResultsDiv = document.getElementById('defense-results');
+                defenseResultsDiv.innerHTML = '';
+                defenseRolls.forEach(roll => {
+                    const diceDiv = document.createElement('div');
+                    diceDiv.className = 'dice defense-dice';
+                    diceDiv.textContent = roll;
+                    defenseResultsDiv.appendChild(diceDiv);
+                });
+                
+                // Show casualties
+                document.getElementById('attack-casualties').textContent = `Attacker loses: ${attackLosses} troops`;
+                document.getElementById('defense-casualties').textContent = `Defender loses: ${defenseLosses} troops`;
+                
+                // Show remaining troops
+                document.getElementById('remaining-troops').innerHTML = `
+                    Remaining troops:<br>
+                    Attacker: ${newAttackTroops}<br>
+                    Defender: ${newDefenseTroops}
+                `;
+                
+                // Update troop counts in form
+                document.getElementById('attack-troops').value = newAttackTroops;
+                document.getElementById('defense-troops').value = newDefenseTroops;
+                
+                // Show results
+                resultsDiv.style.display = 'block';
+            }
+            
+            function checkVictory(attackTroops, defenseTroops) {
+                // Hide any previous victory messages
+                document.getElementById('attack-victory').style.display = 'none';
+                document.getElementById('defense-victory').style.display = 'none';
+                
+                if (defenseTroops <= 0) {
+                    // Attacker wins
+                    document.getElementById('attack-victory').style.display = 'block';
+                    addHistoryItem("Attacker conquers the territory!");
+                } else if (attackTroops < 2) {
+                    // Defender wins (attacker can't continue)
+                    document.getElementById('defense-victory').style.display = 'block';
+                    addHistoryItem("Defender holds the territory!");
+                }
+            }
+            
+            function addHistoryItem(text) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item';
+                itemDiv.textContent = `[${timeString}] ${text}`;
+                historyDiv.appendChild(itemDiv);
+                historyDiv.scrollTop = historyDiv.scrollHeight;
+            }
+            
+            function toggleHistory() {
+                historyVisible = !historyVisible;
+                historyDiv.style.display = historyVisible ? 'block' : 'none';
+                toggleHistoryButton.textContent = historyVisible ? 'Hide Battle History' : 'Show Battle History';
+            }
+        });
+    </script>
+</body>
+</html>
